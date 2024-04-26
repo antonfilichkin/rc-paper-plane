@@ -2,17 +2,22 @@ import esp
 import gc
 import network
 
+
 esp.osdebug(None)
 gc.collect()
 
-ssid = 'Paper-plane-1'
-password = '12345678'
+SSID = 'Paper-plane-1'
+PASSWORD = '12345678'
 
-ap = network.WLAN(network.AP_IF)
-ap.active(True)
-ap.config(essid=ssid, authmode=network.AUTH_WPA_WPA2_PSK, password=password)
+wlan = network.WLAN(network.AP_IF)
+wlan.disconnect()
+wlan.active(True)
+wlan.config(essid=SSID, password=PASSWORD, authmode=network.AUTH_WPA_WPA2_PSK)
 
-while not ap.active():
+while not wlan.active():
     pass
 
-print(f"Access point activated! (IP: {ap.ifconfig()[0]})")
+print(f"Access point activated!")
+print(f"IP: '{wlan.ifconfig()[0]}'")
+mac = ':'.join(['{:02X}'.format(byte) for byte in wlan.config('mac')])
+print(f"MAC: '{mac}' ({wlan.config('mac')})")
