@@ -8,11 +8,11 @@ gc.collect()
 SSID = 'Paper-plane-1'
 PASSWORD = '12345678'
 
-wlan = network.WLAN(network.AP_IF)
+wlan = network.WLAN(network.STA_IF)
 wlan.active(True)
-wlan.config(essid=SSID, password=PASSWORD, authmode=network.AUTH_WPA_WPA2_PSK)
+wlan.connect(SSID, PASSWORD)
 
-while not wlan.active():
+while not wlan.isconnected():
     pass
 
 print(f"Access point activated!")

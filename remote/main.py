@@ -1,11 +1,16 @@
+import asyncio
+
+import client
 import joystick
-from time import time, sleep
 
-while True:
-    x, y, button_state = joystick.read_joystick()
 
-    # Print data with timestamp
-    print(f"Time: {time():.2f} - Joystick X: {x}, Y: {y}, Button: {button_state}")
+async def print_data():
+    while True:
+        print(f"Print task: {joystick.read()}")
+        await asyncio.sleep(1)
 
-    # Sleep for 1 second
-    sleep(1)
+
+loop = asyncio.get_event_loop()
+loop.create_task(joystick.send())
+loop.create_task(client.receive())
+loop.run_forever()
