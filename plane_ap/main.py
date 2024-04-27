@@ -1,30 +1,42 @@
+from machine import deepsleep
 import asyncio
-import server
-import motors
+import wifi
+import config
+import common
 import html_server
 
-c = 0
+
+def power_off():
+    print("Power OFF!")
+    deepsleep()
 
 
-async def sleep():
-    global c
+def mayday():
+    print('Alarm!')
+
+
+connection_lost_sec = 0
+
+
+async def connection_watchdog():
+    global connection_lost_sec
     while True:
-        c += 1
-        print(f"Sleep {c}")
-        await asyncio.sleep(5)
+        if wifi.is_connected():
+            await common.blink(2, 100)
+        elif connection_lost_sec >= config.WIFI_LOST_POWER_OFF_SEC:
+            power_off()
+        else:
+            mayday()
+            connection_lost_sec += 1
+        await asyncio.sleep(1)
 
 
-def exception_handler(loop, context):
-    exception = context['exception']
-    message = context['message']
-    print(f"Task failed, msg={message}, exception={exception}")
-
+# Initial connect
+if not wifi.wait_for_connection(30, 5):
+    power_off()
 
 loop = asyncio.get_event_loop()
-loop.set_exception_handler(exception_handler)
-loop.create_task(server.receive())
-# loop.create_task(motors.send())
+loop.set_exception_handler(common.exception_handler)
+loop.create_task(connection_watchdog())
 loop.create_task(html_server.run_server())
-loop.create_task(sleep())
 loop.run_forever()
-
