@@ -1,0 +1,8 @@
+# WIFI
+SSID = 'paper-plane-poc'
+PASSWORD = '12345678'
+WIFI_LOST_POWER_OFF_SEC = 30
+
+
+# HW
+LED_PIN = 8
