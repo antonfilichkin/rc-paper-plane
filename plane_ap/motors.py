@@ -1,5 +1,6 @@
 from machine import Pin, PWM
-from comand import MotorCommand
+import asyncio
+import server
 
 IN1_PIN = 0
 IN2_PIN = 1
@@ -28,25 +29,30 @@ def rate_to_u16(rate: int):
     return int(rate * (MAX_DUTY_CYCLE - MIN_DUTY_CYCLE) / 100)
 
 
-def set_throttle(command: MotorCommand):
-    __l_pwm__.duty_u16(rate_to_u16(command.left_power))
-    __r_pwm__.duty_u16(rate_to_u16(command.right_power))
-    if command.enabled:
+def set_throttle(left: int, right: int, button_state: int):
+    __l_pwm__.duty_u16(rate_to_u16(left))
+    __r_pwm__.duty_u16(rate_to_u16(right))
+    if button_state:
         __power__.on()
-        print(f"Throttle: left '{command.left_power}', right '{command.right_power}'.")
+        print(f"Throttle: left '{left}', right '{right}'.")
     else:
         __power__.off()
         print(f"Throttle OFF.")
 
 
 def power_off():
-    set_throttle(MotorCommand(False))
+    set_throttle(0, 0, 0)
     print("Disabled DRV8833.")
 
 
 def power_on():
-    set_throttle(MotorCommand(True, 0, 0))
+    set_throttle(0, 0, 1)
     print("Enabled DRV8833.")
 
+
+async def send():
+    while True:
+        await server.send(f'{{"type": "plane", "data": {{"motor": {__power__.value()}}}}}')
+        await asyncio.sleep(10)
 
 power_off()
