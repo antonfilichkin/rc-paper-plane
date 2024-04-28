@@ -1,6 +1,4 @@
 from machine import Pin, PWM
-import asyncio
-import server
 
 IN1_PIN = 0
 IN2_PIN = 1
@@ -22,7 +20,8 @@ __l_dir__.freq(FREQUENCY)
 __r_pwm__.freq(FREQUENCY)
 __r_dir__.freq(FREQUENCY)
 
-__power__ = Pin(POWER_PIN, Pin.OUT)
+# __power__ = Pin(POWER_PIN, Pin.OUT, value=1, hold=True) #1.23
+__power__ = Pin(POWER_PIN, Pin.OUT, value=1)
 
 
 def rate_to_u16(rate: int):
@@ -50,9 +49,17 @@ def power_on():
     print("Enabled DRV8833.")
 
 
-async def send():
-    while True:
-        await server.send(f'{{"type": "plane", "data": {{"motor": {__power__.value()}}}}}')
-        await asyncio.sleep(10)
+def execute(data):
+    l_throttle = data['throttle']['left']
+    r_throttle = data['throttle']['right']
+    __l_pwm__.duty_u16(rate_to_u16(l_throttle))
+    __r_pwm__.duty_u16(rate_to_u16(r_throttle))
+    if data['button']:
+        __power__.on()
+        print(f"Throttle: left '{l_throttle}', right '{r_throttle}'.")
+    else:
+        __power__.off()
+        print(f"Throttle OFF.")
+
 
 power_off()
