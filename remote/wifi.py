@@ -4,6 +4,29 @@ import config
 import common
 
 sta_if = network.WLAN(network.STA_IF)
+mac = str()
+plane_mac = str()
+
+
+def get_plane_mac() -> None or str:
+    retries = 100
+    sleep_time_sec = 0.5
+
+    print('Getting plane MAC ', end='')
+    while retries > 0:
+        scan_results = sta_if.scan()
+        if not scan_results:
+            retries -= 1
+            time.sleep(sleep_time_sec)
+            print('.', end='')
+            continue
+        for ssid, bssid, channel, RSSI, authmode, hidden in scan_results:
+            if ssid.decode('utf-8') == config.SSID:
+                print(f"\nPlane MAC: '{common.mac_byte_to_str(plane_mac)} ({plane_mac})'")
+                return bssid
+
+    print(f"Failed to retrieve Plane MAC! After '{retries}' retries.")
+    return None
 
 
 def enable_sta_if():
@@ -20,6 +43,7 @@ def enable_sta_if():
 
 
 def connect(max_retries: int, pause_sec: int) -> bool:
+    global mac, plane_mac
     counter = 0
     while max_retries > counter:
         try:
@@ -30,7 +54,7 @@ def connect(max_retries: int, pause_sec: int) -> bool:
 
         time.sleep_ms(10)
 
-        if not sta_if.isconnected():
+        if not is_connected():
             print(f"Plane AP '{config.SSID}' was not found! Retrying in '{pause_sec}' seconds.")
             common.sleep_with_blink(pause_sec, 1000)
             counter += 1
@@ -39,9 +63,11 @@ def connect(max_retries: int, pause_sec: int) -> bool:
             pass
         else:
             print(f"Connected to plane AP!")
+            print("-------------------------")
             print(f"IP: '{sta_if.ifconfig()[0]}'")
-            mac = ':'.join(['{:02X}'.format(byte) for byte in sta_if.config('mac')])
-            print(f"MAC: '{mac}' ({sta_if.config('mac')})")
+            mac = sta_if.config('mac')
+            print(f"MAC: '{common.mac_byte_to_str(mac)} ({mac})'")
+            print("-------------------------")
             return True
 
     print(f"Failed to connect to '{config.SSID}'. After '{max_retries}' retries.")

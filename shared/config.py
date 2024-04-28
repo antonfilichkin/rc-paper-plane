@@ -2,7 +2,7 @@
 SSID = 'paper-plane-poc'
 PASSWORD = '12345678'
 WIFI_LOST_POWER_OFF_SEC = 30
-
+FAILSAFE_PING_SEC = 1
 
 # HW
 LED_PIN = 8

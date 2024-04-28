@@ -14,9 +14,11 @@ def enable_ap_if():
     time.sleep(1)
 
     print(f"Access point activated!")
+    print("-------------------------")
     print(f"IP: '{ap_if.ifconfig()[0]}'")
-    mac = ':'.join(['{:02X}'.format(byte) for byte in ap_if.config('mac')])
-    print(f"MAC: '{mac}' ({ap_if.config('mac')})")
+    mac = ap_if.config('mac')
+    print(f"MAC: '{common.mac_byte_to_str(mac)} ({mac})'")
+    print("-------------------------")
 
 
 def wait_for_connection(timeout_sec: int, pause_sec: int = 5) -> bool:
