@@ -86,11 +86,14 @@ def to_motors_throttle():
     turn = __turn__()
 
     if turn < 0:
-        l_throttle = thrust - thrust * (-turn / 100)
+        l_throttle = int(thrust - thrust * (-turn / 100))
         r_throttle = thrust
     else:
         l_throttle = thrust
-        r_throttle = thrust - thrust * (turn / 100)
+        r_throttle = int(thrust - thrust * (turn / 100))
 
     button = not bool(button_state)
-    return {'throttle': {'left': l_throttle, 'right': r_throttle}, 'button': button}
+    if button:
+        return {'left': l_throttle, 'right': r_throttle, 'button': button}
+    else:
+        return {'left': l_throttle, 'right': r_throttle}

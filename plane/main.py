@@ -1,3 +1,4 @@
+import time
 from machine import deepsleep
 import asyncio
 import json
@@ -28,7 +29,7 @@ async def connection_watchdog():
         else:
             mayday()
             connection_lost_sec += 1
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.5)
 
 
 async def execute_commands():
@@ -36,13 +37,14 @@ async def execute_commands():
         command = json.loads(next(esp_now.receive()))
         # print(f"Command: '{command}'.")
         if command['type'] == 'motor':
-            motors.execute(command['data'])
-            await asyncio.sleep(1)
+            motors.command(command['data'])
+            await asyncio.sleep(0.1)
 
 
 # Initial connect
 if not wifi.wait_for_connection(30, 2):
     power_off()
+
 
 loop = asyncio.get_event_loop()
 loop.set_exception_handler(common.exception_handler)

@@ -49,16 +49,13 @@ async def connection_watchdog():
 def __is_update_needed__(sent_data, new_data):
     change_threshold = 1
 
-    if sent_data['button'] != new_data['button']:
+    if new_data.get('button'):
         return True
 
-    sent_throttle = sent_data['throttle']
-    new_throttle = new_data['throttle']
-
-    if abs(sent_throttle['left'] - new_throttle['left']) > change_threshold:
+    if abs(sent_data['left'] - new_data['left']) > change_threshold:
         return True
 
-    if abs(sent_throttle['right'] - new_throttle['right']) > change_threshold:
+    if abs(sent_data['right'] - new_data['right']) > change_threshold:
         return True
 
 

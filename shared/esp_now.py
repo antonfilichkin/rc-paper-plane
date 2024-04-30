@@ -31,7 +31,7 @@ async def send(peer: bytes, m_type: str, data):
     message = json.dumps({"type": m_type, "data": data})
     # print('message', message)
     try:
-        # print(f"Sending: '{message}' to '{peer}'.")
+        print(f"Sending: '{message}' to '{peer}'.")
         if not await e.asend(peer, message.encode('utf-8')):
             print(f"Peer '{peer}' not responding!")
         else:

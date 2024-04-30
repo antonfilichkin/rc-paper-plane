@@ -22,7 +22,8 @@ def get_plane_mac() -> None or str:
             continue
         for ssid, bssid, channel, RSSI, authmode, hidden in scan_results:
             if ssid.decode('utf-8') == config.SSID:
-                print(f"\nPlane MAC: '{common.mac_byte_to_str(plane_mac)} ({plane_mac})'")
+                time.sleep_ms(100)
+                print(f"\nPlane MAC: '{common.mac_byte_to_str(bssid)} ({bssid})'")
                 return bssid
 
     print(f"Failed to retrieve Plane MAC! After '{retries}' retries.")
