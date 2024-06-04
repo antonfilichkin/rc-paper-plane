@@ -60,16 +60,16 @@ def __is_update_needed__(sent_data, new_data):
 
 
 async def send_command():
-    command_send_interval_ms = 100
+    # command_send_interval_ms = 50
     old_data = joystick.to_motors_throttle()
     await esp_now.send(plane_mac, 'motor', old_data)
     while True:
-        await asyncio.sleep_ms(command_send_interval_ms)
+        # await asyncio.sleep_ms(command_send_interval_ms)
         new_data = joystick.to_motors_throttle()
         if __is_update_needed__(old_data, new_data):
             await esp_now.send(plane_mac, 'motor', new_data)
             old_data = new_data
-        await asyncio.sleep(0.5)
+        await asyncio.sleep_ms(50)
 
 
 setup()

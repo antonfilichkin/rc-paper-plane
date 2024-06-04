@@ -48,7 +48,7 @@ if not wifi.wait_for_connection(30, 2):
 
 loop = asyncio.get_event_loop()
 loop.set_exception_handler(common.exception_handler)
-loop.create_task(html_server.run_server())
 loop.create_task(connection_watchdog())
+loop.create_task(html_server.run_server())
 loop.create_task(execute_commands())
 loop.run_forever()
